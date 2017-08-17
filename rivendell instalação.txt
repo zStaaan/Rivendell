@@ -1,0 +1,117 @@
+PARTE 1.: Obs: usar Ubuntu 14.04
+
+1: Instalar repositórios do KXStudio.:
+
+sudo apt-get install apt-transport-https software-properties-common wget
+
+wget https://launchpad.net/~kxstudio-debian/+archive/kxstudio/+files/kxstudio-repos_9.4.3~kxstudio1_all.deb
+
+sudo dpkg -i kxstudio-repos_9.4.3~kxstudio1_all.deb
+
+2: Editar com os comandos abaixo.:
+
+sudo killall pulseaudio
+
+sudo nano /etc/security/limits.conf
+
+@audio - rtprio 99
+@audio - memlock unlimited
+@audio - nice -10
+@rivendell - rtprio 99
+@rivendell - memlock unlimited
+@rivendell - nice -10
+
+3: Instalar os pacotes:
+
+sudo apt-get update
+
+sudo apt-get install cadence pulseaudio-module-jack jack-tools calf-plugins
+
+4: Alterar com os comandos abaixo.:
+
+sudo usermod -a -G audio radio(usuario)
+
+5: Atualizar
+
+sudo apt-get update
+sudo apt-get dist-upgrade
+
+6: Edite o arquivo:
+
+sudo nano /etc/pulse/client.conf
+
+7:"autospawn = yes" alterar o valor "= yes" para "= no".
+
+8:Edite sources.list:
+
+sudo nano /etc/apt/sources.list
+
+deb http://debian.tryphon.eu trusty main contrib
+deb-src http://debian.tryphon.eu trusty main contrib
+
+9:adicione a chave repositório Tryphon:
+
+wget -q -O - http://debian.tryphon.eu/release.asc | sudo apt-key add -
+
+10: Baixe as ferramentas para compilar o driver:
+
+sudo apt-get install build-essential
+
+
+PARTE 2.:
+
+1:pacotes mysql-server.
+
+sudo apt-get update
+sudo apt-get install mysql-server
+
+
+2:instalar o Rivendell.
+
+sudo apt-get install rivendell-server rivendell
+
+Quando ele pergunta se você deseja debconf para gerenciar a configuração para você. Diga não
+
+3: Em seguida, editar rd.conf.
+
+sudo nano /etc/rd.conf
+
+Copie o texto
+
+[mySQL]
+Hostname=localhost
+Loginname=rduser
+Password=letmein
+Database=Rivendell
+Driver=QMYSQL3
+
+[Logs]
+Facility=Syslog
+
+[JackSession]
+Source1=rivendell_0:playout_0L
+Destination1=system:playback_1
+Source2=rivendell_0:playout_0R
+Destination2=system:playback_2
+Source3=system:capture_1
+Destination3=rivendell_0:record_0L
+Source4=system:capture_2
+Destination4=rivendell_0:record_0R
+
+[Tuning]
+UseRealtime=Yes
+RealtimePriority=9
+
+[Format]
+SampleRate=48000
+Channels=2
+
+[Cae]
+# AudioRoot can be changed if your music is stored in another place
+AudioRoot=/var/snd
+AudioExtension=wav
+AllowNonstandardRates=Yes
+
+4: Reinicie e pronto acabou
+
+
